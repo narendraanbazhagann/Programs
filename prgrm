@@ -1,0 +1,85 @@
+import random
+
+grade_points = {'O': 10, 'A': 9, 'B': 8, 'C': 7, 'D': 5, 'U': 0}
+
+def data():
+    for i in range(31):
+        names=['ashwin','aravind','abhi','babu','chandru','david','ragul','ravi','ramu','sam','sarvesh','vijay','akhil','gautham','aakash','vimal','kamal','balaji','vishal','hari','harish','arun','sanjay','santhosh','ajay','vishnu','abinesh','prakash','srini','selva']
+        #names = ["student_" + str(i) for i in range(1, 31)]
+        students = []
+    for name in names:
+        regno = random.randint(65432101,65432150)
+        grades = random.choices(list(grade_points.keys()), k=5)
+        total = sum(grade_points[grade] for grade in grades)
+        percentage = (total / 5) * 10  # Each subject max points = 10
+        students.append((name, regno, grades, total, percentage))
+    return students
+
+def resultfile(file_path):
+    students =data()
+    with open(file_path, 'w') as file:
+        for student in students:
+            name, register_number, grades, total_marks, percentage = student
+            grades_str = ','.join(grades)
+            file.write(f"{name},{register_number},{grades_str},{total_marks},{percentage:.2f}\n")
+
+def openresultfile(file_path):
+    with open(file_path, 'r') as file:
+        content = file.read()
+        print(content)
+
+def analyzeresults(input_file, output_file):
+    students = []
+    # Categorize students
+    categories = {
+        '90_and_above': [],
+        '80_to_89': [],
+        '70_to_79': [],
+        'below_70': [],
+        'arrear': []
+    }    
+    
+    with open(input_file, 'r') as file:
+        for line in file:
+            data = line.strip().split(',')
+            name = data[0]
+            register_number = int(data[1])
+            grades = data[2:7]
+            total_marks = int(data[7])
+            percentage = float(data[8])
+            students.append((name, register_number, grades, total_marks, percentage))
+    
+
+    
+    for student in students:
+        name, register_number, grades, total_marks, percentage = student
+        if 'U' in grades:
+            categories['arrear'].append(student)
+        elif percentage >= 90:
+            categories['90_and_above'].append(student)
+        elif percentage >= 80:
+            categories['80_to_89'].append(student)
+        elif percentage >= 70:
+            categories['70_to_79'].append(student)
+        else:
+            categories['below_70'].append(student)
+    
+    
+    with open(output_file, 'w') as file:
+        for category, students in categories.items():
+            file.write(f"Category: {category.replace('_', ' ').title()}\n")
+            file.write(f"{'Name':<15}{'Register Number':<15}{'Total Marks':<15}{'Percentage':<10}\n")
+            file.write("="*55 + "\n")
+            for student in students:
+                name, register_number, grades, total_marks, percentage = student
+                file.write(f"{name:<15}{register_number:<15}{total_marks:<15}{percentage:<10.2f}\n")
+            file.write("\n")
+
+resultfile('result.txt'
+openresultfile('result.txt')
+
+
+analyzeresults('result.txt', 'analysis.txt')
+
+
+openresultfile('analysis.txt')
